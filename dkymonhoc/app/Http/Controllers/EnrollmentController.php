@@ -2,60 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class EnrollmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $enrollments = Enrollment::with(['student', 'course'])->get();
-        $students = Student::withSum('courses', 'credits')->get();
+        $courses = Course::query()->withCount('enrollments')->orderBy('name')->get();
 
-        return view('enrollments.index', compact('enrollments', 'students'));
+        $query = Enrollment::query()->with(['student', 'course'])->latest();
+
+        if ($request->filled('course_id')) {
+            $query->where('course_id', (int) $request->input('course_id'));
+        }
+
+        $enrollments = $query->paginate(15)->withQueryString();
+
+        return view('enrollments.index', compact('courses', 'enrollments'));
     }
 
     public function create()
     {
-        $students = Student::all();
-        $courses = Course::all();
+        $courses = Course::query()->where('status', 'published')->orderBy('name')->get();
 
-        return view('enrollments.create', compact('students', 'courses'));
+        return view('enrollments.create', compact('courses'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'student_id' => ['required', 'exists:students,id'],
             'course_id' => ['required', 'exists:courses,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
         ]);
 
-        $student = Student::findOrFail($validated['student_id']);
-        $course = Course::findOrFail($validated['course_id']);
+        $student = Student::firstOrCreate(
+            ['email' => $validated['email']],
+            [
+                'name' => $validated['name'],
+                'student_code' => 'HV-'.Str::upper(Str::random(8)),
+            ]
+        );
 
-        $alreadyEnrolled = Enrollment::where('student_id', $student->id)
-            ->where('course_id', $course->id)
+        if ($student->name !== $validated['name']) {
+            $student->update(['name' => $validated['name']]);
+        }
+
+        $exists = Enrollment::query()
+            ->where('student_id', $student->id)
+            ->where('course_id', $validated['course_id'])
             ->exists();
 
-        if ($alreadyEnrolled) {
-            return back()->withInput()->with('error', 'Sinh viên đã đăng ký môn học này.');
+        if ($exists) {
+            return back()->withInput()->with('error', 'Hoc vien da dang ky khoa hoc nay.');
         }
 
-        $currentCredits = $student->totalCredits();
-        if ($currentCredits + $course->credits > 18) {
-            return back()->withInput()->with('error', "Vượt quá giới hạn 18 tín chỉ. Hiện tại: {$currentCredits} tín chỉ, môn này: {$course->credits} tín chỉ.");
-        }
+        Enrollment::create([
+            'student_id' => $student->id,
+            'course_id' => $validated['course_id'],
+        ]);
 
-        Enrollment::create($validated);
-
-        return redirect('/enrollments')->with('success', 'Đăng ký môn học thành công.');
+        return redirect()->route('enrollments.index')->with('success', 'Dang ky khoa hoc thanh cong.');
     }
 
     public function destroy(Enrollment $enrollment)
     {
         $enrollment->delete();
-        return redirect('/enrollments')->with('success', 'Hủy đăng ký thành công.');
+
+        return redirect()->route('enrollments.index')->with('success', 'Da huy dang ky.');
     }
 }

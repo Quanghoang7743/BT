@@ -3,180 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Đăng ký môn học')</title>
+    <title>@yield('title', 'Learning Admin')</title>
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --text: #1e293b;
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --sidebar: #0f172a;
+            --text: #0f172a;
             --muted: #64748b;
-            --glass: rgba(255,255,255,0.55);
-            --border: rgba(255,255,255,0.65);
-            --line: rgba(148,163,184,0.25);
-            --success: rgba(220,252,231,0.72);
+            --line: #e2e8f0;
+            --primary: #0ea5a4;
+            --primary-dark: #0b8b8a;
+            --danger: #dc2626;
+            --success-bg: #dcfce7;
             --success-text: #166534;
-            --error: rgba(254,226,226,0.72);
+            --error-bg: #fee2e2;
             --error-text: #991b1b;
+            --draft-bg: #fef3c7;
+            --draft-text: #92400e;
+            --published-bg: #d1fae5;
+            --published-text: #065f46;
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            min-height: 100vh;
-            font-family: "SF Pro Text","Helvetica Neue","Avenir Next",sans-serif;
+            background: radial-gradient(circle at 5% 5%, #dbeafe 0, transparent 38%), var(--bg);
             color: var(--text);
-            background:
-                radial-gradient(circle at 10% 18%,#c7d2fe,transparent 38%),
-                radial-gradient(circle at 92% 10%,#a5f3fc,transparent 30%),
-                radial-gradient(circle at 85% 88%,#fde68a,transparent 32%),
-                linear-gradient(135deg,#f8fafc 0%,#eef2ff 50%,#fff7ed 100%);
-            padding: 24px 16px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
         }
-        .nav {
-            max-width: 1060px;
-            margin: 0 auto 20px;
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+
+        .app {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
         }
-        .nav a {
-            padding: 9px 16px;
-            border-radius: 999px;
+
+        .sidebar {
+            background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+            color: #e2e8f0;
+            padding: 28px 16px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: 0.03em;
+        }
+
+        .menu a {
+            display: block;
+            padding: 11px 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            color: #cbd5e1;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text);
-            background: var(--glass);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            transition: transform 150ms, box-shadow 150ms;
+            transition: background 0.2s;
         }
-        .nav a:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.18); }
-        .nav a.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 18px rgba(99,102,241,0.3); }
-        .container {
-            max-width: 1060px;
-            margin: 0 auto;
+
+        .menu a:hover,
+        .menu a.active {
+            background: rgba(14, 165, 164, 0.22);
+            color: #f8fafc;
+        }
+
+        .content {
             padding: 24px;
-            border-radius: 28px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 48px rgba(30,41,59,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
-            backdrop-filter: blur(22px) saturate(150%);
-            -webkit-backdrop-filter: blur(22px) saturate(150%);
         }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
             gap: 12px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
-        h1 { font-size: clamp(1.3rem,2.2vw,1.8rem); letter-spacing: -0.02em; }
-        .subtitle { color: var(--muted); font-size: 0.92rem; margin-top: 4px; }
+
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1rem; margin-bottom: 10px; }
+        .subtitle { color: var(--muted); margin-top: 4px; font-size: 0.92rem; }
+
         .btn {
-            color: #fff;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            padding: 10px 18px;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
             border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(99,102,241,0.3);
-            transition: transform 150ms;
+            text-decoration: none;
+            display: inline-block;
+            color: #fff;
+            background: var(--primary);
         }
-        .btn:hover { transform: translateY(-1px); }
-        .btn-sm { padding: 6px 12px; font-size: 0.82rem; }
-        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 8px 20px rgba(239,68,68,0.25); }
-        .btn-outline {
-            color: var(--text);
-            background: rgba(255,255,255,0.55);
-            border: 1px solid var(--line);
-            box-shadow: none;
+
+        .btn:hover { background: var(--primary-dark); }
+        .btn-sm { padding: 7px 10px; font-size: 0.86rem; }
+        .btn-danger { background: var(--danger); }
+        .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--text); }
+
+        .alert { padding: 11px 14px; border-radius: 10px; margin-bottom: 14px; }
+        .alert-success { background: var(--success-bg); color: var(--success-text); }
+        .alert-error { background: var(--error-bg); color: var(--error-text); }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
         }
-        .alert {
-            padding: 11px 14px;
-            border-radius: 14px;
-            margin-bottom: 14px;
-            font-size: 0.92rem;
-        }
-        .alert-success { background: var(--success); color: var(--success-text); border: 1px solid rgba(134,239,172,0.5); }
-        .alert-error { background: var(--error); color: var(--error-text); border: 1px solid rgba(252,165,165,0.5); }
-        .table-wrap {
-            overflow: auto;
-            border-radius: 16px;
-            border: 1px solid var(--line);
-            background: rgba(255,255,255,0.45);
-        }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
-        th {
-            font-size: 0.8rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: #475569;
-            background: rgba(255,255,255,0.4);
-        }
-        tbody tr:hover { background: rgba(255,255,255,0.3); }
-        .empty { text-align: center; color: var(--muted); padding: 20px; }
+
+        .field { margin-bottom: 14px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.92rem; }
-        .field { margin-bottom: 16px; }
-        input, select {
+
+        input, select, textarea {
             width: 100%;
-            padding: 11px 14px;
             border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            padding: 10px 12px;
             font: inherit;
-            font-size: 0.95rem;
-            transition: border-color 150ms, box-shadow 150ms;
+            background: #fff;
         }
-        input:focus, select:focus {
-            outline: none;
-            border-color: rgba(99,102,241,0.5);
-            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
-        }
-        .error-text { color: #b91c1c; font-size: 0.84rem; margin-top: 4px; }
+
+        textarea { resize: vertical; }
+        .error-text { margin-top: 5px; color: var(--danger); font-size: 0.84rem; }
+
+        .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+        th { background: #f8fafc; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
         .badge {
             display: inline-block;
-            padding: 3px 10px;
             border-radius: 999px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            background: rgba(99,102,241,0.12);
-            color: var(--primary-dark);
+            padding: 3px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
         }
-        .badge-warn { background: rgba(245,158,11,0.15); color: #92400e; }
-        .actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-        .glass-form {
-            max-width: 560px;
-            background: rgba(255,255,255,0.45);
+
+        .badge-draft { background: var(--draft-bg); color: var(--draft-text); }
+        .badge-published { background: var(--published-bg); color: var(--published-text); }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stat {
             border: 1px solid var(--line);
-            border-radius: 18px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 14px;
+            background: #fff;
         }
-        @media (max-width: 640px) {
-            .container { padding: 16px; border-radius: 20px; }
-            .header { align-items: flex-start; }
-            .btn { width: 100%; text-align: center; }
+
+        .stat p { color: var(--muted); font-size: 0.85rem; }
+        .stat strong { font-size: 1.2rem; display: block; margin-top: 4px; }
+
+        .course-card {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .course-thumb-wrap { height: 120px; background: #f1f5f9; }
+        .course-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .course-thumb.placeholder { display: flex; align-items: center; justify-content: center; color: var(--muted); }
+        .course-body { padding: 12px; }
+        .course-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .course-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 4px; }
+
+        .cards { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 12px; margin-top: 14px; }
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .pagination { margin-top: 14px; }
+
+        @media (max-width: 960px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar { padding: 16px; }
+            .content { padding: 16px; }
+            .filters { grid-template-columns: 1fr 1fr; }
+            .grid-4 { grid-template-columns: 1fr 1fr; }
+            .cards { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <nav class="nav">
-        <a href="/enrollments" class="{{ request()->is('enrollments*') ? 'active' : '' }}">Đăng ký môn</a>
-        <a href="/students" class="{{ request()->is('students*') ? 'active' : '' }}">Sinh viên</a>
-        <a href="/courses" class="{{ request()->is('courses*') ? 'active' : '' }}">Môn học</a>
-    </nav>
-    <div class="container">
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-error">{{ session('error') }}</div>
-        @endif
-        @yield('content')
-    </div>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">Learning Admin</div>
+        <nav class="menu">
+            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Trang chu</a>
+            <a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">Khoa hoc</a>
+            <a href="{{ route('lessons.index') }}" class="{{ request()->routeIs('lessons.*') ? 'active' : '' }}">Bai giang</a>
+            <a href="{{ route('enrollments.index') }}" class="{{ request()->routeIs('enrollments.*') ? 'active' : '' }}">Dang ky hoc vien</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <section class="panel">
+            @if (session('success'))
+                <x-alert type="success">{{ session('success') }}</x-alert>
+            @endif
+
+            @if (session('error'))
+                <x-alert type="error">{{ session('error') }}</x-alert>
+            @endif
+
+            @yield('content')
+        </section>
+    </main>
+</div>
 </body>
 </html>

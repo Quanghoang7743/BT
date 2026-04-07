@@ -1,38 +1,37 @@
 @extends('layouts.app')
-@section('title', 'Đăng ký môn học mới')
+
+@section('title', 'Dang ky khoa hoc')
+
 @section('content')
-<h1 style="margin-bottom:20px;">Đăng ký môn học</h1>
-<div class="glass-form">
-    <form action="/enrollments" method="POST">
-        @csrf
-        <div class="field">
-            <label for="student_id">Sinh viên</label>
-            <select id="student_id" name="student_id" required>
-                <option value="">-- Chọn sinh viên --</option>
-                @foreach ($students as $student)
-                    <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                        {{ $student->student_code }} - {{ $student->name }}
-                    </option>
-                @endforeach
-            </select>
-            @error('student_id') <p class="error-text">{{ $message }}</p> @enderror
-        </div>
-        <div class="field">
-            <label for="course_id">Môn học</label>
-            <select id="course_id" name="course_id" required>
-                <option value="">-- Chọn môn học --</option>
-                @foreach ($courses as $course)
-                    <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                        {{ $course->course_code }} - {{ $course->name }} ({{ $course->credits }} tín chỉ)
-                    </option>
-                @endforeach
-            </select>
-            @error('course_id') <p class="error-text">{{ $message }}</p> @enderror
-        </div>
-        <div class="actions">
-            <button class="btn" type="submit">Đăng ký</button>
-            <a class="btn btn-outline" href="/enrollments">Quay lại</a>
-        </div>
-    </form>
+<div class="header">
+    <div>
+        <h1>Dang ky khoa hoc</h1>
+        <p class="subtitle">Chon khoa hoc va nhap thong tin hoc vien</p>
+    </div>
 </div>
+
+<form method="POST" action="{{ route('enrollments.store') }}">
+    @csrf
+
+    <div class="field">
+        <label for="course_id">Khoa hoc</label>
+        <select id="course_id" name="course_id" required>
+            <option value="">Chon khoa hoc</option>
+            @foreach($courses as $course)
+                <option value="{{ $course->id }}" @selected((string) old('course_id') === (string) $course->id)>
+                    {{ $course->name }} - {{ number_format($course->price, 0, ',', '.') }} VND
+                </option>
+            @endforeach
+        </select>
+        @error('course_id') <p class="error-text">{{ $message }}</p> @enderror
+    </div>
+
+    <x-form.input name="name" label="Ten hoc vien" required="true" />
+    <x-form.input name="email" type="email" label="Email" required="true" />
+
+    <div class="actions">
+        <button class="btn" type="submit">Dang ky</button>
+        <a class="btn btn-outline" href="{{ route('enrollments.index') }}">Quay lai</a>
+    </div>
+</form>
 @endsection

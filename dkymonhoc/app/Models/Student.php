@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
-    protected $fillable = ['name', 'student_code'];
+    protected $fillable = ['name', 'email', 'student_code'];
 
     public function enrollments(): HasMany
     {
@@ -19,8 +19,8 @@ class Student extends Model
         return $this->belongsToMany(Course::class, 'enrollments');
     }
 
-    public function totalCredits(): int
+    public function totalRevenue(): float
     {
-        return $this->courses()->sum('credits');
+        return (float) $this->enrollments()->join('courses', 'courses.id', '=', 'enrollments.course_id')->sum('courses.price');
     }
 }
